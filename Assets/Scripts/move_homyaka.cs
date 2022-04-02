@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class move_homyaka : MonoBehaviour
 {
     // Start is called before the first frame update
+    // объект ниже назначается на старте, в этом случае нет смысла в атрибуте [SerializeField]
     [SerializeField] private ARRaycastManager _raycastManager;
 
     private List<ARRaycastHit> _raycastHits = new List<ARRaycastHit>();
@@ -15,6 +16,8 @@ public class move_homyaka : MonoBehaviour
     {
         GameObject arso = GameObject.Find("AR Session Origin");
         Debug.Log(arso);
+        // для более емкой записи можно так:
+        // var arrm = arso.GetComponent<ARRaycastManager>();
         ARRaycastManager arrm = arso.GetComponent(typeof(ARRaycastManager)) as ARRaycastManager;
         Debug.Log(arrm);
         _raycastManager = arrm;
@@ -46,6 +49,7 @@ public class move_homyaka : MonoBehaviour
                 Vector3 direction = diff;
                 Vector3 velocity  = speed * direction;
 
+                // update() вызывается один раз в кадр, и если Rigidbody переиспользуется каждый кадр (а это так), его однозначно нужно кешировать на старте
                 GetComponent<Rigidbody>().velocity = velocity;
             }
 

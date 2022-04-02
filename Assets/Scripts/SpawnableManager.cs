@@ -6,7 +6,15 @@ using UnityEngine.UI;
 
 public class SpawnableManager : MonoBehaviour
 {
+    // в проект однозначно стоит добавлять файл .gitignore
+    
+    // 5 - понятный концепт, реализлванный, все собралось и работало
+    // 0 - неконсистентный code style в отношении названия классов и методов, хорошо бы выбрать 1 в рамках проекта,
+    // а не чередовать CamelCase / pascalCase / snake_case + есть неудаленные комментарии дефолтного инстанса MonoBeh
+    // 6 - есть вопросы к коду, но в целом все нормально
+    
     [SerializeField] private ARRaycastManager _raycastManager;
+    // объект ниже нигде не используется
     [SerializeField] private GameObject _spawnablePrefab;
 
     private List<ARRaycastHit> _raycastHits = new List<ARRaycastHit>();
@@ -16,6 +24,7 @@ public class SpawnableManager : MonoBehaviour
 
     private void Start()
     {
+        // эта строка фактически ничего не делает, т.к. объект был объявлен, но не инициализирован, а значит и так будет Null на старте
         _spawnedObject = null;
 
     }
@@ -26,7 +35,6 @@ public class SpawnableManager : MonoBehaviour
         var start_cube = Resources.Load("Blocks/start_point");
         var finsh_cube = Resources.Load("Blocks/end_point");
         var walll_cube = Resources.Load("Blocks/wall");
-
         GameObject maze = new GameObject();
         maze.transform.position = position;
         maze.transform.localScale = new Vector3(scale, scale, scale);
@@ -40,6 +48,8 @@ public class SpawnableManager : MonoBehaviour
             px += 1.0f;
             GameObject cube = null;
             if (chr == 'x') {
+                // Чтобы не использовать приведение Object к GameObject,
+                // можно делать подгрузку ресурсов через Resources.Load<GameObject>(), в этом случае полученный объект уже будет GameObject
                 cube = (GameObject)Instantiate(walll_cube, position, Quaternion.identity);
             }
             else if (chr == 'f') {
@@ -62,6 +72,7 @@ public class SpawnableManager : MonoBehaviour
 
         GameObject floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
         floor.GetComponent<Renderer>().enabled = false;
+        // переменные ниже нигде не используются, если с коллайдером не нужна работа после добавления, можно просто написать maze.AddComponent<BoxCollider>()
         BoxCollider floor_collider = maze.AddComponent<BoxCollider>();
         floor.transform.SetParent(maze.transform, false);
         floor.transform.localPosition = new Vector3(0, -0.5f, 0);
@@ -72,6 +83,7 @@ public class SpawnableManager : MonoBehaviour
 
     private void startGame(GameObject _lab) {
         GameObject _playerPrefab = (GameObject)Resources.Load("Blocks/homyak");
+        // "start_point" используется несколько раз, чтобы избежать ошибок при написании строк в разных местах, их можно выносить в константы.
         GameObject start_point = _lab.transform.Find("start_point").gameObject;
         Vector3 pos = start_point.transform.position;
         pos = new Vector3(
@@ -99,7 +111,11 @@ public class SpawnableManager : MonoBehaviour
 
         // Save the found touch event
         Touch touch = Input.GetTouch(0);
-
+        
+        // Понятно, что !GameObject.Find("homyak") значит, что уровень завершен, и можно новый ставить,
+        // но понятно это только после того, как посмотришь на проект в целом.
+        // Если по крайней мере ввести переменную, которая объяснит суть булевой проверки, станет более понятно, при этом не нужно будет менять композицию кода.
+        // Кроме того, у проверки есть минус, что может быть еще какая-то причина для уничтожения хомяка, это не будет масштабироваться и это нужно учитывать.
         if (_raycastManager.Raycast(touch.position, _raycastHits) && !GameObject.Find("homyak"))
         {
             if (labyrinth)
@@ -112,6 +128,7 @@ public class SpawnableManager : MonoBehaviour
             }
             if (touch.phase == TouchPhase.Ended)
             {
+                // пустые if'ы
             }
         }
     }
